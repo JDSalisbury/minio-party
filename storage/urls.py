@@ -1,3 +1,6 @@
+from storage.core import views
+from django.contrib.auth import views as auth_views
+from django.conf.urls import url
 """storage URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -18,4 +21,5 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('doc/', views.DocumentCreateView.as_view(), name='home'),
 ]
