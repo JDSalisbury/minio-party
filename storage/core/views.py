@@ -29,7 +29,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
         print("-------------Print")
         print(*args)
         print(**kwargs)
-        logging.DEBUG('Test')
+        logging.warning('Test')
         return self.create(request, *args, **kwargs)
 
 
