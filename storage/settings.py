@@ -19,7 +19,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'storages',
     'storage.core',
 ]
 
@@ -105,5 +104,5 @@ BUCKET_NAME = 'local-test-media'
 
 S3_BUCKET = S3.Bucket(BUCKET_NAME)
 
-AWS_ACCESS_KEY_ID = ''
-AWS_SECRET_ACCESS_KEY = ''
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
