@@ -1,23 +1,8 @@
-from django.contrib.auth.decorators import login_required
-from django.views.generic.edit import CreateView
-from django.urls import reverse_lazy
 from .serializer import DocumentSerializer
 from .models import Document
-import boto3
-from rest_framework import permissions, viewsets
-from botocore.client import Config
-import logging
-
-s3 = boto3.resource(
-    's3',
-    endpoint_url='http://localhost:9000',
-    aws_access_key_id='NRY1PGXB4K5N8UK9XORC',
-    aws_secret_access_key='uUQtcMEoX7phtXEkmvSX+C2wH7kHNaZHm600cUKh',
-    config=Config(signature_version='s3v4'),
-    region_name='us-east-1'
-)
-
-logger = logging.getLogger(__name__)
+from storage import settings
+from rest_framework import permissions, viewsets, status
+from rest_framework.response import Response
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
@@ -25,28 +10,25 @@ class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request, *args, **kwargs):
-        print("-------------Print")
-        print(*args)
-        print(**kwargs)
-        logging.warning('Test')
-        return self.create(request, *args, **kwargs)
+    def minioBucket(self, request):
+        file = request.FILES.get('file')
+        settings.S3_BUCKET.put_object(
+            ACL='public-read-write',
+            Key=file.name,
+            Body=file
+        )
 
+    def perform_create(self, serializer):
+        serializer.save()
 
-class DocumentCreateView(CreateView):
-    model = Document
-    fields = ['file', ]
-    success_url = reverse_lazy('home')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        documents = Document.objects.all()
-        context['documents'] = documents
-        return context
-
-    def post(self, request, *args, **kwargs):
-        print("==========THIS=========")
-        print(request)
-        print("asdfasd")
-        s3.Bucket('local-test-media').upload_file(
-            Filename=f'{self}', Key=self)
+    def create(self, request, *args, **kwargs):
+        self.minioBucket(request)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )

@@ -1,44 +1,13 @@
-
 import os
+import boto3
+from botocore.client import Config
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 SECRET_KEY = '%&*=#0vzfj!k&*ej&ct^3#!0abi5!yqeq28i%1e9dd1060=9%('
-LOGGING = {
-    'version': 1,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'C:/Users/jsalisbury/Documents/Python/mino-party/debug.log',
-            'formatter': 'simple'
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    }
-}
+
 DEBUG = True
-for logger in LOGGING['loggers']:
-    LOGGING['loggers'][logger]['handlers'] = ['console']
 ALLOWED_HOSTS = []
 
 
@@ -69,7 +38,7 @@ ROOT_URLCONF = 'storage.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'storage/templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -109,32 +78,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'verbose': {
-#             'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'file': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'filename': 'C:/Users/jsalisbury/Documents/Python/mino-party/debug.log',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#     },
-# }
-
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -148,29 +91,19 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'storage/static'),
-]
-# AWS_S3_SECURE_URLS = False
-# AWS_QUERYSTRING_AUTH = False
 
+S3 = boto3.resource(
+    's3',
+    endpoint_url='http://localhost:9000',
+    aws_access_key_id='NRY1PGXB4K5N8UK9XORC',
+    aws_secret_access_key='uUQtcMEoX7phtXEkmvSX+C2wH7kHNaZHm600cUKh',
+    config=Config(signature_version='s3v4'),
+    region_name='us-east-1'
+)
 
-AWS_ACCESS_KEY_ID = 'NRY1PGXB4K5N8UK9XORC'
-AWS_SECRET_ACCESS_KEY = 'uUQtcMEoX7phtXEkmvSX+C2wH7kHNaZHm600cUKh'
-AWS_ACL_POLICY = 'public-read'
-BOTO_S3_BUCKET = 'local-test-media'
-BOTO_S3_HOST = 'http://localhost:9000'
-BOTO_BUCKET_LOCATION = 'us-east-1'
-AWS_S3_FORCE_HTTP_UR = True
-# AWS_STORAGE_BUCKET_NAME = 'local-test-media'
-# AWS_S3_CUSTOM_DOMAIN = 'test'
+BUCKET_NAME = 'local-test-media'
 
-# AWS_S3_OBJECT_PARAMETERS = {
-#     'CacheControl': 'max-age=86400',
-# }
+S3_BUCKET = S3.Bucket(BUCKET_NAME)
 
-# AWS_LOCATION = 'static'
-# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-# STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
-
-# DEFAULT_FILE_STORAGE = 'storage.storage_backends.MediaStorage'
+AWS_ACCESS_KEY_ID = ''
+AWS_SECRET_ACCESS_KEY = ''
